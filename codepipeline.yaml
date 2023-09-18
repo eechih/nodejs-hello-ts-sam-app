@@ -5,6 +5,7 @@ Description: >
   The following stages are predefined in this template:
   - Source
   - UpdatePipeline
+  - UnitTest
   - BuildAndDeployFeatureStack (FeatureGitBranch only)
   - BuildAndPackage (MainGitBranch only)
   - DeployTest (MainGitBranch only)
@@ -183,7 +184,6 @@ Resources:
                 - Name: !Sub ${AWS::StackName}ChangeSet
               RunOrder: 2
 
-        # Uncomment and modify the following step for running the unit-tests
         - Name: UnitTest
           Actions:
             - Name: UnitTest

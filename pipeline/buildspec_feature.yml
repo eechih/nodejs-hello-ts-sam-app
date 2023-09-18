@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.8
+      python: 3.11
     commands:
       - pip install --upgrade pip
       - pip install --upgrade awscli aws-sam-cli
@@ -14,8 +14,8 @@ phases:
       - sam build --use-container --template ${SAM_TEMPLATE}
       - . ./assume-role.sh ${TESTING_PIPELINE_EXECUTION_ROLE} feature-deploy
       - sam deploy --stack-name $(echo ${FEATURE_BRANCH_NAME} | tr -cd '[a-zA-Z0-9-]')
-                    --capabilities CAPABILITY_IAM
-                    --region ${TESTING_REGION}
-                    --s3-bucket ${TESTING_ARTIFACT_BUCKET}
-                    --no-fail-on-empty-changeset
-                    --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+        --capabilities CAPABILITY_IAM
+        --region ${TESTING_REGION}
+        --s3-bucket ${TESTING_ARTIFACT_BUCKET}
+        --no-fail-on-empty-changeset
+        --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
