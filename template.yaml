@@ -1,16 +1,67 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   nodejs-hello-ts-sam-app
 
   Sample SAM Template for nodejs-hello-ts-sam-app
-  
+
+Parameters:
+  UserPoolName:
+    Type: String
+    Default: nodejs-hello-ts-sam-app-user-pool
+    Description: The User Pool Name
+  UserPoolClientName:
+    Type: String
+    Default: nodejs-hello-ts-sam-app-user-pool-client
+    Description: The User Pool Client Name
+  AppSyncApiName:
+    Type: String
+    Default: nodejs-hello-ts-sam-app-graphql-api
+    Description: The GraphQL Api Name
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
 
 Resources:
+  # AppSync Api
+  GraphqlApi:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: ./graphql/template.yml
+      Parameters:
+        AppSyncApiName: !Ref AppSyncApiName
+        UserPoolId: !Ref UserPool
+  # Cognito
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      UsernameConfiguration:
+        CaseSensitive: false
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_CODE
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Ref UserPoolClientName
+      GenerateSecret: false
+      RefreshTokenValidity: 30
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -31,8 +82,8 @@ Resources:
         Minify: true
         Target: "es2020"
         Sourcemap: true
-        EntryPoints: 
-        - app.ts
+        EntryPoints:
+          - app.ts
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -47,3 +98,6 @@ Outputs:
   HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFunctionRole.Arn
+  UserPoolId:
+    Description: "The id for the user pool"
+    Value: !Ref UserPool

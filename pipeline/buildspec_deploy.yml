@@ -16,3 +16,7 @@ phases:
         --s3-bucket ${ENV_BUCKET}
         --no-fail-on-empty-changeset
         --role-arn ${ENV_CLOUDFORMATION_EXECUTION_ROLE}
+        --parameter-overrides
+        UserPoolName=${ENV_STACK_NAME}-userpool
+        UserPoolClientName=${ENV_STACK_NAME}-userpool-client
+        AppSyncApiName=${ENV_STACK_NAME}-graphql-api
